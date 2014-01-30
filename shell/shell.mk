@@ -14,7 +14,10 @@ obj-$(CONFIG_WR_NODE) += \
 	shell/cmd_init.o \
 	shell/cmd_ptrack.o \
 	shell/cmd_help.o \
-	shell/cmd_refresh.o
+	shell/cmd_refresh.o\
+	shell/cmd_delay.o\
+	shell/cmd_delay_send.o\
+	shell/cmd_delay_recv.o
 
 obj-$(CONFIG_ETHERBONE) +=			shell/cmd_ip.o
 obj-$(CONFIG_PPSI) +=				shell/cmd_verbose.o

@@ -323,8 +323,8 @@ void update_rx_queues()
 	if (recvd <= 0)		/* No data received? */
 		return;
 
-    if (hdr.ethtype == 0xcafe)
-      pp_printf("PACKET T %x mac %x:%x:%x:%x:%x:%x\n", hdr.ethtype,
+   if (hdr.ethtype == 0xcafe)
+      pp_printf("--------------------PACKET T %x mac %x:%x:%x:%x:%x:%x\n", hdr.ethtype,
         hdr.dstmac[0], hdr.dstmac[1], hdr.dstmac[2],
         hdr.dstmac[3], hdr.dstmac[4], hdr.dstmac[5]);
 

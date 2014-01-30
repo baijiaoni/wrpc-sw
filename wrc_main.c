@@ -26,6 +26,7 @@
 #include "onewire.h"
 #include "pps_gen.h"
 #include "shell.h"
+#include "lib/delay.h"
 #include "lib/ipv4.h"
 #include "rxts_calibrator.h"
 
@@ -41,6 +42,9 @@ int32_t sfp_alpha = 73622176;	//default values if could not read EEPROM
 int32_t sfp_deltaTx = 46407;
 int32_t sfp_deltaRx = 167843;
 uint32_t cal_phase_transition = 2389;
+
+uint32_t uDelay;
+
 
 static void wrc_initialize()
 {
@@ -89,7 +93,7 @@ static void wrc_initialize()
 	//try reading t24 phase transition from EEPROM
 	calib_t24p(WRC_MODE_MASTER, &cal_phase_transition);
 
-  //delay_init("wru1");
+  delay_init("wru1");
 #ifdef CONFIG_ETHERBONE
 	ipv4_init("wru1");
 	arp_init("wru1");
@@ -166,7 +170,6 @@ extern uint32_t _fstack;
 static void check_stack(void)
 {
 	while (_endram != ENDRAM_MAGIC) {
-		mprintf("Stack overflow!\n");
 		timer_delay_ms(1000);
 	}
 }
@@ -218,10 +221,10 @@ static void check_reset(void)
 	_endram = 0;
 	_reset_handler();
 }
-
 # else /* no CONFIG_CHECK_RESET */
 
-static void check_reset(void) {}
+static void check_reset(void) {
+  }
 
 #endif
 
@@ -251,16 +254,24 @@ int main(void)
 #ifdef CONFIG_ETHERBONE
 		case LINK_WENT_UP:
 			needIP = 1;
-			break;
+      break;
+
 #endif
 
 		case LINK_UP:
 			update_rx_queues();
-     // delay_poll();
-      delay_send();
+
+      if(uDelay)
+      {
+        delay_send();
+      }
+      else
+      {
+        delay_poll();
+      }
 
 #ifdef CONFIG_ETHERBONE
-			ipv4_poll();
+//			ipv4_poll();
 			arp_poll();
 #endif
 			break;
