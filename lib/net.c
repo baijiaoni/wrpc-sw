@@ -144,7 +144,7 @@ void ptpd_netif_linearize_rx_timestamp(wr_timestamp_t * ts, int32_t dmtd_phase,
   nsec_r = ts->nsec;
 /* The falling edge TS is the rising - 1 thick if the "rising counter ahead" bit is set. */
  	nsec_f = cntr_ahead ? ts->nsec - (clock_period / 1000) : ts->nsec;
-        
+
 
 /* Adjust the rising edge timestamp phase so that it "jumps" roughly around the point
    where the counter value changes */
@@ -153,14 +153,14 @@ void ptpd_netif_linearize_rx_timestamp(wr_timestamp_t * ts, int32_t dmtd_phase,
 		phase_r += clock_period;
 
 /* Do the same with the phase for the falling edge, but additionally shift it by extra 180 degrees
-  (so that it matches the falling edge counter) */ 
+  (so that it matches the falling edge counter) */
 	int phase_f = ts->raw_phase - transition_point + (clock_period / 2);
 	if(phase_f < 0)
 		phase_f += clock_period;
 	if(phase_f >= clock_period)
 		phase_f -= clock_period;
 
-/* If we are within +- 25% from the transition in the rising edge counter, pick the falling one */	
+/* If we are within +- 25% from the transition in the rising edge counter, pick the falling one */
   if( phase_r > 3 * clock_period / 4 || phase_r < clock_period / 4 )
   {
 		ts->nsec = nsec_f;
@@ -323,11 +323,29 @@ void update_rx_queues()
 	if (recvd <= 0)		/* No data received? */
 		return;
 
+    if (hdr.ethtype == 0xcafe)
+      pp_printf("PACKET T %x mac %x:%x:%x:%x:%x:%x\n", hdr.ethtype,
+        hdr.dstmac[0], hdr.dstmac[1], hdr.dstmac[2],
+        hdr.dstmac[3], hdr.dstmac[4], hdr.dstmac[5]);
+
+//    pp_printf("PACKET: \n");
+
+//  for(i=0;i<25;i++)
+//  {
+//    pp_printf("%x ", payload[i]);
+//    if((i+1)%10 == 0)
+//      pp_printf("\n");
+//  }
+
+//  pp_printf("\n");
+
 	for (i = 0; i < NET_MAX_SOCKETS; i++) {
 		s = &socks[i];
+
 		if (s->in_use && !memcmp(hdr.dstmac, s->bind_addr.mac, 6)
 		    && hdr.ethtype == s->bind_addr.ethertype)
 			break;	/*they match */
+
 		s = NULL;
 	}
 

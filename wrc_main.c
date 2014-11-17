@@ -89,6 +89,7 @@ static void wrc_initialize()
 	//try reading t24 phase transition from EEPROM
 	calib_t24p(WRC_MODE_MASTER, &cal_phase_transition);
 
+  //delay_init("wru1");
 #ifdef CONFIG_ETHERBONE
 	ipv4_init("wru1");
 	arp_init("wru1");
@@ -238,6 +239,8 @@ int main(void)
 	wrc_ptp_set_mode(WRC_MODE_SLAVE);
 	wrc_ptp_start();
 
+  pp_printf("version with delay \n");
+
 	//try to read and execute init script from EEPROM
 	shell_boot_script();
 
@@ -253,6 +256,9 @@ int main(void)
 
 		case LINK_UP:
 			update_rx_queues();
+     // delay_poll();
+      delay_send();
+
 #ifdef CONFIG_ETHERBONE
 			ipv4_poll();
 			arp_poll();
